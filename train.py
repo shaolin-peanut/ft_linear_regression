@@ -30,25 +30,26 @@ def fit(x, y, alpha, iters):
     theta = np.zeros(2)
     cost_history = []
 
-    # save deviations to rescale later
-    ystd = np.std(y)
     xstd = np.std(x)
+    ystd = np.std(y)
 
-    # scale it down
-    x =  x / xstd 
-    y = y / ystd
+    x_scaled = x / xstd
+    y_scaled = y / ystd
+
+    #x =  x / xstd 
+    #y = y / ystd
 
     for i in range(iters):
-        y_pred = estimate_price(x, theta)
-        residual = y_pred - y
+        y_pred = estimate_price(x_scaled, theta)
+        residual = y_pred - y_scaled
 
         gradient_intercept = np.sum(residual) / xlen
-        gradient_slope = np.sum(residual * x) / xlen
+        gradient_slope = np.sum(residual * x_scaled) / xlen
 
         theta[0] -= alpha * gradient_intercept
         theta[1] -= alpha * gradient_slope 
 
-        cost = np.sum((y_pred - y) ** 2) / (2 * len(y))
+        cost = np.sum((y_pred - y_scaled) ** 2) / (2 * len(y))
         cost_history.append(cost_history)
 
         if i % 50 == 0:
@@ -56,8 +57,8 @@ def fit(x, y, alpha, iters):
 
     # scale it back up
     d_theta = np.zeros(2)
-    d_theta[1] = theta[1] * np.std(y) / np.std(x)
-    d_theta[0] = theta[0] * np.std(y)
+    d_theta[0] = theta[0] * ystd
+    d_theta[1] = (theta[1] * ystd) / xstd
 
     return d_theta, cost_history
 
